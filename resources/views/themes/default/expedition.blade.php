@@ -35,7 +35,7 @@
             @foreach ($data as $item)
                 <div class="uk-margin-medium-bottom">
                     <div class="uk-card uk-card-default bg-primary border">
-                        <a href="{{ url('page/' . tripurl($item->uri)) }}" class="uk-display-block uk-inline-clip uk-transition-toggle uk-link-toggle uk-overflow-hidden border">
+                        <a href="{{ url('trip/' . tripurl($item->uri)) }}" class="uk-display-block uk-inline-clip uk-transition-toggle uk-link-toggle uk-overflow-hidden border">
                             <div class="uk-card-media-top uk-230">
                                 <img src="{{ $item->thumbnail ? asset('uploads/original/'.$item->thumbnail) : asset('theme-assets/img/slider1.jpeg')}}" loading="lazy" alt="{{$item->trip_title}}"  class="border uk-transition-scale-up uk-transition-opaque">
                             </div>
@@ -47,7 +47,7 @@
                                     @if($item->duration)
                                         <div class="uk-package-badge">{{$item->duration}}</div>
                                     @endif
-                                    <div class="uk-package-badge uk-margin-vertical">{{$item->trip_grade ?  grade_message_trek($item->trip_grade) : 'Moderate'}}</div> 
+                                    <div class="uk-package-badge uk-margin-vertical">{{$item->trip_grade ?  grade_message_trek($item->trip_grade) : 'Moderate'}}</div>
                                     @if($item->max_altitude)
                                         <div class="uk-package-badge">{{$item->max_altitude}}</div>
                                     @endif
@@ -55,7 +55,7 @@
                                 <p class="text-white f-14 fw-500 three-line uk-margin-remove-bottom">{{$item->sub_title}}</p>
                             </div>
                             <div class="uk-margin-small-top">
-                                <a href="{{ url('page/' . tripurl($item->uri)) }}" class="uk-btn1 uk-btn-primary uk-width-1-1 uk-flex uk-flex-middle uk-flex-between p-btn">Learn More <span uk-icon="chevron-right"></span></a>
+                                <a href="{{ url('trip/' . tripurl($item->uri)) }}" class="uk-btn1 uk-btn-primary uk-width-1-1 uk-flex uk-flex-middle uk-flex-between p-btn">Learn More <span uk-icon="chevron-right"></span></a>
                             </div>
                         </div>
                     </div>

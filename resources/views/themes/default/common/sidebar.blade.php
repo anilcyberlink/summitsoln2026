@@ -4,7 +4,7 @@
         <hr>
         <ul class="uk-news-list">
             @foreach ($sidebar as $row)
-                <li class="two-line"><a href="{{ url(geturl($row->uri, $row->page_key)) }}">{{$row->post_title}}</a></li>
+                <li class="two-line"><a href="{{ url('page/' . geturl($row->uri, $row->page_key)) }}">{{$row->post_title}}</a></li>
             @endforeach
         </ul>
         <div>
@@ -14,5 +14,5 @@
         </div>
     </div>
     </div>
-    
+
 </div>

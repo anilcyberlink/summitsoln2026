@@ -94,6 +94,17 @@ function check_uri($uri)
     return false;
 }
 
+// function geturl($uri = NULL, $page_key = NULL)
+// {
+//     $count = PostModel::where(['uri' => $uri])->count();
+//     $data = PostModel::where(['uri' => $uri])->firstOrFail();
+//     if ($count > 1 || $uri === NULL || $uri === "") {
+//         $count = PostModel::where(['page_key' => $page_key])->count();
+//         $data = PostModel::where(['page_key' => $page_key])->firstOrFail();
+//         return $data->page_key . '.html';
+//     }
+//     return $data->uri . '.html';
+// }
 function geturl($uri = NULL, $page_key = NULL)
 {
     $count = PostModel::where(['uri' => $uri])->count();
@@ -101,9 +112,9 @@ function geturl($uri = NULL, $page_key = NULL)
     if ($count > 1 || $uri === NULL || $uri === "") {
         $count = PostModel::where(['page_key' => $page_key])->count();
         $data = PostModel::where(['page_key' => $page_key])->firstOrFail();
-        return $data->page_key . '.html';
+        return $data->page_key;
     }
-    return $data->uri . '.html';
+    return $data->uri;
 }
 
 function posttype_geturl($uri)
@@ -236,14 +247,23 @@ function activity_byregions($region_id)
     return $data;
 }
 
+// function tripurl($uri)
+// {
+//     $count = TripModel::where(['uri' => $uri])->count();
+//     $data = TripModel::where(['uri' => $uri])->first();
+//     if ($count > 1) {
+//         return $data->uri . '.html';
+//     }
+//     return $data->uri . '.html';
+// }
 function tripurl($uri)
 {
     $count = TripModel::where(['uri' => $uri])->count();
     $data = TripModel::where(['uri' => $uri])->first();
     if ($count > 1) {
-        return $data->uri . '.html';
+        return $data->uri;
     }
-    return $data->uri . '.html';
+    return $data->uri;
 }
 
 

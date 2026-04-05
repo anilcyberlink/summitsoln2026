@@ -38,7 +38,7 @@
 				@foreach ($trip as $item)
 					<div class="uk-margin-medium-bottom">
 						<div class="uk-card uk-card-default bg-primary border">
-							<a href="{{ url('page/' . tripurl($item->uri)) }}">
+							<a href="{{ url('trip/' . tripurl($item->uri)) }}">
 								<div class="uk-card-media-top uk-160">
 									<img src="{{ $item->thumbnail ? asset('uploads/original/'.$item->thumbnail) : asset('theme-assets/img/slider1.jpeg')}}" loading="lazy" alt="{{$item->trip_title}}" class="border">
 								</div>
@@ -51,7 +51,7 @@
 									</div>
 									<p class="text-white f-14 fw-500">{{$item->sub_title}}</p>
 									<div>
-										<a href="{{ url('page/' . tripurl($item->uri)) }}" class="uk-btn1 uk-btn-primary uk-width-1-1 uk-flex uk-flex-middle uk-flex-between p-btn">Learn More <span uk-icon="chevron-right"></span></a>
+										<a href="{{ url('trip/' . tripurl($item->uri)) }}" class="uk-btn1 uk-btn-primary uk-width-1-1 uk-flex uk-flex-middle uk-flex-between p-btn">Learn More <span uk-icon="chevron-right"></span></a>
 									</div>
 								</div>
 							</div>

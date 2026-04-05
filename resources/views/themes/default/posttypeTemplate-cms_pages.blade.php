@@ -27,7 +27,7 @@
         <div class="uk-child-width-1-2@s" uk-grid uk-scrollspy="target: img,h2,.uk-overlay-primary; cls: uk-animation-fade; delay: 100;">
             @foreach ($posts as $row)
                 <div>
-                    <a href="{{ url(geturl($row->uri, $row->page_key)) }}">
+                    <a href="{{ url('page/' . geturl($row->uri, $row->page_key)) }}">
                         <div class="uk-display-block uk-inline-clip uk-transition-toggle border  uk-260">
                             <img src="{{$row->page_thumbnail ? asset('uploads/medium/'.$row->page_thumbnail) : asset('theme-assets/img/nepal.jpg')}}" loading="lazy" class="border uk-transition-scale-up uk-transition-opaque" alt="">
                             <div class="uk-overlay-primary uk-position-cover border"></div>

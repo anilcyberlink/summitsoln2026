@@ -1,6 +1,6 @@
 @extends('themes.default.common.master')
 @section('meta_keyword', trim(($setting->meta_title ?? '') . ', ' . ($setting->meta_key ?? ''), ', '))
-@section('meta_description', $setting->meta_description)  
+@section('meta_description', $setting->meta_description)
 @section('content')
 
 <!--banner-section-start-->
@@ -23,7 +23,7 @@
                             @endif
                         </div>
                     </div>
-                    <div class="uk-width-2-5@m uk-flex uk-flex-right uk-visible@m"> 
+                    <div class="uk-width-2-5@m uk-flex uk-flex-right uk-visible@m">
                         <div class="uk-banner-icon">
                             <a href="{{$setting->instagram_link}}" target="_blank" class="uk-icon-button uk-margin-small-right" uk-icon="instagram"></a>
                             <a href="{{$setting->facebook_link}}" target="_blank" class="uk-icon-button  uk-margin-small-right" uk-icon="facebook"></a>
@@ -147,7 +147,7 @@
         <div class="uk-text-section uk-text-center" uk-scrollspy="cls: uk-animation-fade;  delay: 100; repeat: false">
             <h2 class="text-primary uk-margin-remove-top uk-margin-remove-bottom">Activities</h2>
             <img src="{{asset('theme-assets/img/blue-line.png')}}" loading="lazy" alt="underline-img">
-            
+
            <p class="text-black fw-500">
               {!! $setting->fp_activity !!}
            </p>
@@ -171,7 +171,7 @@
                               <div class="uk-overlay uk-position-top uk-padding-small">
                                  @if($item->external_link)
                                     <a href="{{$item->external_link}}" class="uk-icon-button uk-activities-icon">
-                                 @else   
+                                 @else
                                     <a href="{{ route('page.activitydetail', $item->uri) }}" class="uk-icon-button uk-activities-icon">
                                  @endif
                                  {{ $loop->iteration }}
@@ -213,7 +213,7 @@
                               @foreach ($package_list as $item)
                                  <div>
                                     <div class="uk-card uk-card-default bg-primary border">
-                                          <a href="{{ url('page/' . tripurl($item->uri)) }}"  class="uk-display-block uk-inline-clip uk-transition-toggle uk-link-toggle uk-overflow-hidden border">
+                                          <a href="{{ url('trip/' . tripurl($item->uri)) }}"  class="uk-display-block uk-inline-clip uk-transition-toggle uk-link-toggle uk-overflow-hidden border">
                                              <div class="uk-card-media-top uk-160" >
                                                 <img src="{{$item->thumbnail ? asset('uploads/original/'.$item->thumbnail) : asset('theme-assets/img/mountain-1.jpeg')}}" loading="lazy" alt="" class="border uk-transition-scale-up uk-transition-opaque">
                                              </div>
@@ -227,7 +227,7 @@
                                                     <p class="text-white f-14 fw-500 three-line uk-margin-remove-bottom">{{$item->sub_title}}</p>
                                               </div>
                                               <div class="uk-margin-small-top">
-                                                  <a href="{{ url('page/' . tripurl($item->uri)) }}" class="uk-btn1 uk-btn-primary uk-width-1-1 uk-flex uk-flex-middle uk-flex-between p-btn">Learn More <span uk-icon="chevron-right"></span></a>
+                                                  <a href="{{ url('trip/' . tripurl($item->uri)) }}" class="uk-btn1 uk-btn-primary uk-width-1-1 uk-flex uk-flex-middle uk-flex-between p-btn">Learn More <span uk-icon="chevron-right"></span></a>
                                               </div>
                                           </div>
                                     </div>
@@ -364,7 +364,7 @@
                             <form class="uk-contact-form" action="{{ route('post-trip-review') }}" method="POST"  enctype="multipart/form-data">
                                 @csrf
                                 <div class=" uk-child-width-1-2@m uk-grid">
-                                    <div class="uk-margin-small-top"> 
+                                    <div class="uk-margin-small-top">
                                         <label class="uk-form-label uk-text-bold" for="full_name">Full Name</label>
                                         <div class="uk-form-controls">
                                             <input class="uk-input" id="fullname" name="full_name" required type="text">
@@ -399,14 +399,14 @@
                                     </div>
                                 </div>
                                 <div class="uk-margin-small-top">
-                                    <label class="uk-form-label uk-text-bold" for="country">Country</label> 
+                                    <label class="uk-form-label uk-text-bold" for="country">Country</label>
                                     <div class="uk-form-controls">
                                         <select class="uk-select border" id="country" name="country" required type="text">
                                             @include('themes.default.common.country')
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="uk-margin-small-top">
                                     <label class="uk-form-label uk-text-bold" for="contact">Message</label>
                                     <div class="uk-form-controls">

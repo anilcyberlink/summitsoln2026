@@ -50,7 +50,7 @@
     <meta name="twitter:description" content="@yield('meta_description')">
     <meta name="twitter:card" content="summary_large_image"/>
     <script src="https://unpkg.com/lottie-web@5.10.2/build/player/lottie.min.js"></script>
-     <meta name="google-site-verification" content="CPzV52xVx7fgob5gElg8md9t-u2NXSEkEUKAo6Uh3Z8" /> 
+     <meta name="google-site-verification" content="CPzV52xVx7fgob5gElg8md9t-u2NXSEkEUKAo6Uh3Z8" />
      <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JSBZLKSRMH"></script>
 <script>
@@ -194,7 +194,7 @@
             </script>
     </div>
 
-    
+
     <header class="uk-position-top">
         <div class="uk-main-header uk-navbar-container uk-navbar-transparent uk-visible@l" uk-sticky="top: 100; animation: uk-animation-slide-top-medium;" style="z-index:1000;">
             <div class="uk-container">
@@ -425,14 +425,14 @@
                                                 <div>
                                                     <ul class="uk-navbar-ul">
                                                         @foreach ($cmspages_posts->take(2) as $row)
-                                                            <li><a href="{{ url(geturl($row->uri, $row->page_key)) }}">{{$row->post_title}}</a></li>
+                                                            <li><a href="{{ url('page/' . geturl($row->uri, $row->page_key)) }}">{{$row->post_title}}</a></li>
                                                         @endforeach
                                                     </ul>
                                                 </div>
                                                 <div>
                                                     <ul class="uk-navbar-ul">
                                                         @foreach ($cmspages_posts->skip(2) as $row)
-                                                            <li><a href="{{ url(geturl($row->uri, $row->page_key)) }}">{{$row->post_title}}</a></li>
+                                                            <li><a href="{{ url('page/' . geturl($row->uri, $row->page_key)) }}">{{$row->post_title}}</a></li>
                                                         @endforeach
                                                     </ul>
                                                 </div>
@@ -465,7 +465,7 @@
                     <div class="uk-navbar-left">
                         <a class=" uk-logo" href="{{ url('/') }}"> <img src="{{asset('theme-assets/img/logo-white.png')}}" class="uk-logo-white" width="180" alt="">
                         <a class=" uk-logo" href="{{ url('/') }}"> <img src="{{asset('theme-assets/img/logo-dark.png')}}" class="uk-logo-dark" width="180" alt="">
-                        <img src="{{asset('theme-assets/img/logo-dark.png')}}" alt="" class="uk-logo-primary" > 
+                        <img src="{{asset('theme-assets/img/logo-dark.png')}}" alt="" class="uk-logo-primary" >
                     </div>
                     <div class="uk-navbar-right">
                         <div class="uk-navbar-item text-white f-18">
@@ -556,7 +556,7 @@
                                                 </a>
                                                 <ul class="uk-nav-sub">
                                                     @foreach ($cmspages_posts as $row)
-                                                        <li><a href="{{ url(geturl($row->uri, $row->page_key)) }}">{{$row->post_title}}</a></li>
+                                                        <li><a href="{{ url('page/' . geturl($row->uri, $row->page_key)) }}">{{$row->post_title}}</a></li>
                                                     @endforeach
                                                     <li><a href="{{route('page.posttype_detail',$itemUri)}}"> View All</a></li>
                                                 </ul>
