@@ -15,6 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="canonical" href="https://summitsolutionexpeds.com{{ request()->getRequestUri() }}">
     <!---------------- Fav icon starts --------------------->
     	<!--<link rel="shortcut icon" href="{{asset('images/favicon.png')}}">-->
     	<!--<link rel="apple-touch-icon-precomposed" href="{{asset('images/favicon.png')}}">-->

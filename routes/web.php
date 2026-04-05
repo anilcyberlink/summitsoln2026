@@ -6,7 +6,7 @@ use App\Http\Controllers\HBLController;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Route;
 
-
+Route::get('/sitemap.xml', [FrontpageController::class, 'sitemap']);
 /************************** Sangam Routes Starts *********************************/
 Route::get('/himalayan/payment/verify/{data}',[HBLController::class,'payment_verify'])->name('himalayan.payment.verify');
 Route::any('/himalayan/success',[HBLController::class,'success'])->name('himalayan.success');
