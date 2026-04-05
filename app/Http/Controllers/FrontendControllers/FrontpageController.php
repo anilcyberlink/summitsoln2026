@@ -56,6 +56,8 @@ use App\Models\Destinations\DestinationModel;
 use App\Models\Destinations\DestinationBannerModel;
 use App\Models\Destinations\DestinationActivityrelModel;
 use App\Models\Posts\PostImageModel;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
 /******************* Sangam starts *****************/
 use App\Http\Controllers\HBLController;
 use App\Models\Inquiry\EnrollmentModel;
@@ -69,31 +71,31 @@ class FrontpageController extends Controller
         $banners = BannerModel::all();
         $homeBrief = HomeBriefModel::where('id', 1)->first();
         $whoweare = PostModel::where('id', '157')->first();
-        $whywork= PostModel::where('id',149)->first();
-        $images=PostImageModel::where('post_id',148)->get();
+        $whywork = PostModel::where('id', 149)->first();
+        $images = PostImageModel::where('post_id', 148)->get();
         $famous_trips = TripModel::where(['video_status' => '1', 'status' => '1'])->orderBy('ordering', 'asc')->get();
         $trekking = TripModel::where(['trip_type' => '1', 'status' => '1'])->take(8)->get();
-        $expedition = ActivityModel::where('activity_parent','expedition')->orderBy('ordering','asc')->get();
-        $expeditionParent = ActivityModel::where(['id'=>'58'])->first();
+        $expedition = ActivityModel::where('activity_parent', 'expedition')->orderBy('ordering', 'asc')->get();
+        $expeditionParent = ActivityModel::where(['id' => '58'])->first();
         $tripofMonth = TripModel::where('trip_of_the_month', '1')->first();
         $reviews = TripReview::where('status', 1)->orderBy('created_at', 'desc')->get();
-        $team = AssociatedPostModel::where(['post_id' => '125'])->where('show_in_home',1)->limit(2)->get();
-        $guide= PostModel::where('id',125)->first();
-        $activity_list =  ActivityModel::where(['activity_parent'=>'activity'])->orderBy('ordering', 'asc')->get();
+        $team = AssociatedPostModel::where(['post_id' => '125'])->where('show_in_home', 1)->limit(2)->get();
+        $guide = PostModel::where('id', 125)->first();
+        $activity_list = ActivityModel::where(['activity_parent' => 'activity'])->orderBy('ordering', 'asc')->get();
         $destination = DestinationModel::where('status', '1')->take(4)->get();
-        $sevenSummit = ActivityModel::where(['id'=>'55'])->first();
+        $sevenSummit = ActivityModel::where(['id' => '55'])->first();
         $package_list = collect();
         if ($sevenSummit) {
             $tripIds = $sevenSummit->trips()->pluck('trip_id');
             $package_list = TripModel::whereIn('id', $tripIds)->get();
         }
-        $packages = ActivityModel::where('activity_parent','package')->orderBy('ordering','asc')->take(2)->get();
-        $aboutUs = PostTypeModel::where(['status'=>'1','is_menu'=>'1','id' => '22'])->orderBy('ordering','asc')->first(); 
+        $packages = ActivityModel::where('activity_parent', 'package')->orderBy('ordering', 'asc')->take(2)->get();
+        $aboutUs = PostTypeModel::where(['status' => '1', 'is_menu' => '1', 'id' => '22'])->orderBy('ordering', 'asc')->first();
         $blog = PostTypeModel::where('id', '33')->first();
         $blogs = PostModel::where(['post_type' => $blog->id])->orderBy('post_order', 'desc')->take(2)->get();
         $contact = PostTypeModel::where('id', '26')->first();
         // dd($packages);
-        return view('themes.default.frontpage', compact('banners','homeBrief','whoweare','famous_trips','trekking','expedition','tripofMonth','blog','blogs','reviews','contact','images','whywork','team','guide','activity_list','destination','expeditionParent','sevenSummit','package_list','packages','aboutUs'));
+        return view('themes.default.frontpage', compact('banners', 'homeBrief', 'whoweare', 'famous_trips', 'trekking', 'expedition', 'tripofMonth', 'blog', 'blogs', 'reviews', 'contact', 'images', 'whywork', 'team', 'guide', 'activity_list', 'destination', 'expeditionParent', 'sevenSummit', 'package_list', 'packages', 'aboutUs'));
     }
 
 
@@ -111,17 +113,17 @@ class FrontpageController extends Controller
         if ($data) {
             // $posts = PostModel::where(['post_type' => $data->id, 'status' => '1', 'post_parent' => '0'])->orderBy('post_order', 'asc')->paginate(16);
             $query = PostModel::where(['post_type' => $data->id, 'status' => '1', 'post_parent' => '0'])->orderBy('post_order', 'asc');
-            
+
             $posts = $query->paginate($data->uri === 'blog' ? 4 : 16);
             $multiphotos = PostImageModel::where('post_id', $posts->first()?->id)->latest()->get();
-            
+
         }
-        $team_category = TeamCategory::where(['team_parent'=>'0' , 'status'=> 1])->get();
-        $related_teams =  TeamModel::all()->groupBy('category');
-        $packages = ActivityModel::where('activity_parent','package')->orderBy('ordering','asc')->get();
+        $team_category = TeamCategory::where(['team_parent' => '0', 'status' => 1])->get();
+        $related_teams = TeamModel::all()->groupBy('category');
+        $packages = ActivityModel::where('activity_parent', 'package')->orderBy('ordering', 'asc')->get();
         // dd($posts ,$data);
-        $trips=TripModel::where('status','1')->get();
-        return view('themes.default.' . $data['template'] . '', compact('data', 'posts','multiphotos','team_category','related_teams','packages','trips'));
+        $trips = TripModel::where('status', '1')->get();
+        return view('themes.default.' . $data['template'] . '', compact('data', 'posts', 'multiphotos', 'team_category', 'related_teams', 'packages', 'trips'));
     }
 
 
@@ -155,7 +157,7 @@ class FrontpageController extends Controller
 
         $blog_child = PostModel::where(['post_type' => $data['post_type'], 'post_parent' => '122'])->paginate(2);
         $team = TeamModel::all();
-        $faq =  AssociatedPostModel::where('post_id', '130')->get();
+        $faq = AssociatedPostModel::where('post_id', '130')->get();
 
         $review = TripReview::where('status', '1')->orderBy('id', 'desc')->paginate(5);
         $setting = SettingModel::where('id', 1)->first();
@@ -225,20 +227,35 @@ class FrontpageController extends Controller
         }
         $tripId = TripModel::where('uri', $uri)->first();
         $tripUri = $uri;
-        $similar_tripsId= $tripId->relatedtrips()->pluck('related_trip_id');
+        $similar_tripsId = $tripId->relatedtrips()->pluck('related_trip_id');
         if ($similar_tripsId->isNotEmpty()) {
             $similar_trips = TripModel::whereIn('id', $similar_tripsId)->take(3)->get();
-        }
-        else{
+        } else {
             $similar_trips = TripModel::where('uri', '!=', $uri)->orderBy('ordering', 'desc')->take(3)->get();
         }
         $activity = TripModel::find($data->id)->activities()->get();
 
-        $setting = SettingModel::where('id',1)->first();
-        return view('themes.default.tripdetail', compact('data', 'trip_review',
-            'cost_includes', 'cost_excludes', 'itinerary',
-            'photo_videos', 'activity','similar_trips','photos','videos','local','banner','setting','schedules','faqs','tripId', 'tripUri'));
-    }  
+        $setting = SettingModel::where('id', 1)->first();
+        return view('themes.default.tripdetail', compact(
+            'data',
+            'trip_review',
+            'cost_includes',
+            'cost_excludes',
+            'itinerary',
+            'photo_videos',
+            'activity',
+            'similar_trips',
+            'photos',
+            'videos',
+            'local',
+            'banner',
+            'setting',
+            'schedules',
+            'faqs',
+            'tripId',
+            'tripUri'
+        ));
+    }
 
     //<------------------------------------------Activity Frontend---------------------------------------------->
 
@@ -246,12 +263,12 @@ class FrontpageController extends Controller
     {
         $data = ActivityModel::where('uri', $uri)->first();
         $template = $data->template;
-        $trips = ActivityModel::find($data->id)->trips()->where('status','1')->orderBy('ordering','asc')->paginate(6);
-        $trips_activity = ActivityModel::find($data->id)->trips()->where('status','1')->orderBy('ordering','asc')->get();
+        $trips = ActivityModel::find($data->id)->trips()->where('status', '1')->orderBy('ordering', 'asc')->paginate(6);
+        $trips_activity = ActivityModel::find($data->id)->trips()->where('status', '1')->orderBy('ordering', 'asc')->get();
         $destination = DestinationModel::all();
         $activity = ActivityModel::where(['status' => '1'])->orderBy('ordering', 'asc')->orderBy('ordering', 'asc')->get();
         $tailor_made = ActivityModel::where('id', 17)->first();
-        $banner =  ActivityBannerModel::where('activity_id', $data->id)->get();
+        $banner = ActivityBannerModel::where('activity_id', $data->id)->get();
         $similar_activity = $data->relatedActivities;
         $extension = TripGroupModel::where('id', 4)->first();
         return view('themes.default.' . $template, compact('data', 'trips', 'trips_activity', 'similar_activity', 'activity', 'destination', 'banner', 'tailor_made', 'extension'));
@@ -337,36 +354,36 @@ class FrontpageController extends Controller
                     'trip_end_date' => $request->trip_end_date,
                     'trip_days' => $request->trip_days,
                     'dob' => $request->dob,
-                    'passport_number'=> $request->passport_number,
-                    'passport_expire'=> $request->passport_expire,
-                    'payment_type'=> $request->payment_type,
+                    'passport_number' => $request->passport_number,
+                    'passport_expire' => $request->passport_expire,
+                    'payment_type' => $request->payment_type,
                     'hear' => $request->hear,
                     'paid_status' => 0,
                 ]);
                 if ($create) {
-                    if($request->has_arrival_detail == 1){
+                    if ($request->has_arrival_detail == 1) {
                         $flight = FlightDetails::create([
-                            'booking_id'=> $create->id,
+                            'booking_id' => $create->id,
                             'airline_name' => $request->airline_name,
                             'airline_no' => $request->airline_no,
                             'arrival_from' => $request->arrival_from,
-                            'arrival_date'=> $request->arrival_date,
-                            'arrival_time'=> $request->arrival_time. ' '.$request->time1
-                            
+                            'arrival_date' => $request->arrival_date,
+                            'arrival_time' => $request->arrival_time . ' ' . $request->time1
+
                         ]);
-                        if($flight && $request->has_departure_detail == 1){
+                        if ($flight && $request->has_departure_detail == 1) {
                             $flight->update([
                                 'departure_airline_name' => $request->departure_airline_name,
                                 'departure_airline_no' => $request->departure_airline_no,
                                 'departure_from' => $request->departure_from,
-                                'departure_date'=> $request->departure_date,
-                                'departure_time'=> $request->departure_time. ' '.$request->time2
+                                'departure_date' => $request->departure_date,
+                                'departure_time' => $request->departure_time . ' ' . $request->time2
                             ]);
                         }
                     }
-                    if($request->has_insurance_detail == 1){
+                    if ($request->has_insurance_detail == 1) {
                         $insurance = Insurance::create([
-                            'booking_id'=> $create->id,
+                            'booking_id' => $create->id,
                             'insurance_company' => $request->insurance_company,
                             'insurance_phone' => $request->insurance_phone,
                             'policy_no' => $request->policy_no
@@ -374,7 +391,7 @@ class FrontpageController extends Controller
 
                     }
                     $emergency_info = Emergency::create([
-                        'booking_id'=> $create->id,
+                        'booking_id' => $create->id,
                         'emergency_fullname' => $request->emergency_fullname,
                         'emergency_relation' => $request->emergency_relation,
                         'emergency_phone_no' => $request->emergency_phone_no,
@@ -383,7 +400,7 @@ class FrontpageController extends Controller
                         'emergency_zip' => $request->emergency_zip,
                         'emergency_country' => $request->emergency_country
                     ]);
-                    if($request->payment_type == 'hbl-pay'){
+                    if ($request->payment_type == 'hbl-pay') {
                         $data = [
                             'booking_id' => $create->id,
                             'total_price' => $trip->price * $request->total_travellers,
@@ -393,7 +410,7 @@ class FrontpageController extends Controller
                         return redirect()->route('himalayan.payment.verify', ['data' => $dataJson]);
                     }
                     // return new AdminBookingMail();
-                    // return new BookTrip($request->email);  
+                    // return new BookTrip($request->email);
                     Mail::send(new AdminBookingMail($setting->email_secondary));
                     Mail::send(new BookTrip($request->email));
                     $name = $request->full_name;
@@ -415,18 +432,19 @@ class FrontpageController extends Controller
         return $result;
     }
 
-    public function inquiry_now($uri = NULL){
+    public function inquiry_now($uri = NULL)
+    {
         // dd('test',$uri);
         $trips = TripModel::all();
         $activity = ActivityModel::where('activity_parent', 'trekking')->get();
         // $terms = PostModel::where('id', '134')->first();
         $data = PostTypeModel::where('id', '24')->first();
-        $sidebar = PostModel::where(['post_type'=>$data->id])->get();
-        if(!empty($uri)){
+        $sidebar = PostModel::where(['post_type' => $data->id])->get();
+        if (!empty($uri)) {
             $trips = TripModel::where('uri', $uri)->first();
             $activity = $trips->activities->first();
         }
-        return view('themes.default.inquiry',compact('trips','activity','data','sidebar','uri'));
+        return view('themes.default.inquiry', compact('trips', 'activity', 'data', 'sidebar', 'uri'));
     }
     public function post_inquiry(Request $request)
     {
@@ -436,7 +454,7 @@ class FrontpageController extends Controller
         $result = $this->getCaptcha($g_recaptcha_response);
         if ($result->success == true && $result->score > 0.6) {
             if ($request->isMethod('post')) {
-                $validator = Validator::make($request->all(),[
+                $validator = Validator::make($request->all(), [
                     'name' => 'required|string|max:255',
                     'email' => 'required|email|max:255',
                     'contact' => 'required|string|max:20',
@@ -456,7 +474,7 @@ class FrontpageController extends Controller
                 $post->email = $request->email;
                 $post->number = $request->contact;
                 $post->country = $request->country;
-                $post->message= $request->message;
+                $post->message = $request->message;
                 if ($post->save()) {
                     return new AdminBookingMail();
                     // Mail::send(new AdminInquiryMail());
@@ -536,32 +554,32 @@ class FrontpageController extends Controller
         return redirect()->intended(url('/'))->with('success', $status);
     }
 
-    public function contact_us(Request $request)  
+    public function contact_us(Request $request)
     {
         // $g_recaptcha_response = $request->input('g_recaptcha_response');
         // $result = $this->getCaptcha($g_recaptcha_response);
         // if ($result->success == true && $result->score > 0.6) {
-            $request->validate([
-                'full_name' => 'required',
-                'number' => 'required',
-                'email' => 'required|email',
-            ]);
+        $request->validate([
+            'full_name' => 'required',
+            'number' => 'required',
+            'email' => 'required|email',
+        ]);
 
-            if ($request->isMethod('post')) {
-                $setting = SettingModel::where('id', 1)->first();
-                $create = Contact::create([
-                    'full_name' => $request->full_name,
-                    'email' => $request->email,
-                    'number' => $request->number,
-                    'message' => $request->comments,
-                    'country' => $request->country,
-                    'trip'=>$request->trip
-                ]);
-                // Mail::send(new \App\Mail\AdminContactMail($request->email));
-                $name = $request->full_name;
-                $message = "<p>Thanks for contacting us. One of our team will be in touch with you soon.</p>";
-                return view('themes.default.booking-success', compact('message', 'name'));
-            }
+        if ($request->isMethod('post')) {
+            $setting = SettingModel::where('id', 1)->first();
+            $create = Contact::create([
+                'full_name' => $request->full_name,
+                'email' => $request->email,
+                'number' => $request->number,
+                'message' => $request->comments,
+                'country' => $request->country,
+                'trip' => $request->trip
+            ]);
+            // Mail::send(new \App\Mail\AdminContactMail($request->email));
+            $name = $request->full_name;
+            $message = "<p>Thanks for contacting us. One of our team will be in touch with you soon.</p>";
+            return view('themes.default.booking-success', compact('message', 'name'));
+        }
         // } else {
         //     return back()->with('error', 'You are a robot');
         // }
@@ -600,7 +618,7 @@ class FrontpageController extends Controller
                     'country' => 'required',
                 ]);
 
-                $tailor  = new TripTailormadeModel;
+                $tailor = new TripTailormadeModel;
                 $tailor->title = $request->title;
                 $tailor->full_name = $request->full_name;
                 $tailor->email = $request->email;
@@ -664,7 +682,7 @@ class FrontpageController extends Controller
                 $trips = ActivityModel::find($request->activity)->trips()
                     ->where('duration', '<=', $request->days)
                     ->get();
-                return  view('themes.default.search-trip', compact('trips'));
+                return view('themes.default.search-trip', compact('trips'));
             } else {
                 return back()->with('error', 'Please enter the number of days.');
             }
@@ -674,11 +692,11 @@ class FrontpageController extends Controller
     public function search_all(Request $request)
     {
         $content_search = $request->search;
-        // Search Trips 
+        // Search Trips
         // dd($content_search);
         $trip = TripModel::where('status', '1')->where('trip_title', 'like', '%' . trim($content_search) . '%')->orWhere('uri', 'like', '%' . trim($content_search) . '%')->paginate(8);
 
-        //Search Category 
+        //Search Category
         $category = ActivityModel::where('title', 'like', '%' . trim($content_search) . '%')->orWhere('uri', 'like', '%' . trim($content_search) . '%')->get();
 
         //Search Post(Company)
@@ -693,7 +711,7 @@ class FrontpageController extends Controller
         //Search Destination
         $destination = DestinationModel::where('status', '1')->where('title', 'like', '%' . trim($content_search) . '%')->orWhere('uri', 'like', '%' . trim($content_search) . '%')->get();
         // dd($content_search,$request);
-        return view('themes.default.search', compact('trip', 'category', 'team', 'region', 'destination','content_search'));
+        return view('themes.default.search', compact('trip', 'category', 'team', 'region', 'destination', 'content_search'));
     }
 
     public function booking_now(Request $request)
@@ -703,13 +721,13 @@ class FrontpageController extends Controller
         $result = $this->getCaptcha($g_recaptcha_response);
         if ($result->success == true) {
             if ($request->isMethod('post')) {
-                $validator = Validator::make($request->all(),[
+                $validator = Validator::make($request->all(), [
                     'name' => 'required|string|max:255',
                     'email' => 'required|email|max:255',
                     'contact' => 'required|string|max:20',
                     'country' => 'required|string|max:100',
                     'activity_type' => 'nullable',
-                    'trip' => 'required|exists:cl_trip_details,id', 
+                    'trip' => 'required|exists:cl_trip_details,id',
                     'start_date' => 'required|date|after_or_equal:today',
                     'end_date' => 'required|date|after_or_equal:today',
                     'peoples' => 'required|integer|min:1|max:100',
@@ -722,7 +740,7 @@ class FrontpageController extends Controller
                 if (!$tripData) {
                     return back()->withErrors('Trip not found!')->withInput();
                 }
-                if($request->has('custom') && !empty($request->custom)){
+                if ($request->has('custom') && !empty($request->custom)) {
                     $create = CustomizeModel::create([
                         'trip_id' => $request->trip,
                         'title' => $tripData->trip_title,
@@ -735,7 +753,7 @@ class FrontpageController extends Controller
                         'trip_end_date' => $request->end_date,
                         'comments' => $request->requirement,
                     ]);
-                }else{
+                } else {
                     $create = BookingModel::create([
                         'trip_id' => $request->trip,
                         'title' => $tripData->trip_title,
@@ -749,7 +767,7 @@ class FrontpageController extends Controller
                         'hear' => $request->requirement,
                     ]);
                 }
-                if($create){
+                if ($create) {
                     return new AdminBookingMail();
                     // Mail::send(new AdminBookingMail());
                     // Mail::send(new BookTrip($request->email));
@@ -772,7 +790,7 @@ class FrontpageController extends Controller
         $result = $this->getCaptcha($g_recaptcha_response);
         if ($result->success == true) {
             if ($request->isMethod('post')) {
-                $validator = Validator::make($request->all(),[
+                $validator = Validator::make($request->all(), [
                     'name' => 'required|string|max:255',
                     'email' => 'required|email|max:255',
                     'contact' => 'required|string|max:50',
@@ -799,7 +817,7 @@ class FrontpageController extends Controller
                     'start_date' => $request->start_date,
                     'message' => $request->message,
                 ]);
-                if($create){
+                if ($create) {
                     return new EnrollmentMail();
                     // Mail::send(new EnrollmentMail($setting->email_secondary));
                     // Mail::send(new BookTrip($request->email));
@@ -822,14 +840,14 @@ class FrontpageController extends Controller
         $activity = ActivityModel::where('activity_parent', 'trekking')->get();
         $terms = PostModel::where('id', '134')->first();
         $data = PostTypeModel::where('id', '24')->first();
-        $sidebar = PostModel::where(['post_type'=>$data->id])->get();
+        $sidebar = PostModel::where(['post_type' => $data->id])->get();
         // dd($activity,$trips);
-        return view('themes.default.booking', compact('booking', 'terms', 'trips', 'activity','start_date','sidebar'));
+        return view('themes.default.booking', compact('booking', 'terms', 'trips', 'activity', 'start_date', 'sidebar'));
     }
 
     public function getTrips(Request $request)
     {
-        $activity_ids = ActivityModel::where(['activity_parent'=>$request->activity_type])->pluck('id');
+        $activity_ids = ActivityModel::where(['activity_parent' => $request->activity_type])->pluck('id');
         $trips = TripModel::whereHas('activities', function ($query) use ($activity_ids) {
             $query->whereIn('activity_id', $activity_ids);
         })->get();
@@ -838,18 +856,18 @@ class FrontpageController extends Controller
         return response()->json($trips);
     }
 
-    public function showbooking(Request $request,$uri)
+    public function showbooking(Request $request, $uri)
     {
-        $start_date = $request->start_date ? $request->start_date: null;
+        $start_date = $request->start_date ? $request->start_date : null;
         $end_date = $request->end_date ? $request->end_date : null;
         $booking = TripModel::where('uri', $uri)->first();
         $trips = TripModel::all();
         $activity = $booking->activities->first();
         $terms = PostModel::where('id', '134')->first();
         $data = PostTypeModel::where('id', '24')->first();
-        $sidebar = PostModel::where(['post_type'=>$data->id])->get();
+        $sidebar = PostModel::where(['post_type' => $data->id])->get();
         // dd($start_date,$booking,$trips,$activity,$terms);
-        return view('themes.default.booking', compact('booking', 'terms', 'trips', 'activity', 'start_date', 'end_date','sidebar'));
+        return view('themes.default.booking', compact('booking', 'terms', 'trips', 'activity', 'start_date', 'end_date', 'sidebar'));
     }
 
 
@@ -860,15 +878,13 @@ class FrontpageController extends Controller
 
     public function customize_trip(Request $request)
     {
-        if($request->isMethod('get'))
-        {
-        $uri=$request->uri;
-        $data= TripModel::where('uri',$uri)->first();
-        return view('themes.default.customize-trip',compact('data'));
+        if ($request->isMethod('get')) {
+            $uri = $request->uri;
+            $data = TripModel::where('uri', $uri)->first();
+            return view('themes.default.customize-trip', compact('data'));
         }
 
-        if($request->isMethod('post'))
-        {
+        if ($request->isMethod('post')) {
             $setting = SettingModel::where('id', 1)->first();
             $g_recaptcha_response = $request->input('g_recaptcha_response');
             $result = $this->getCaptcha($g_recaptcha_response);
@@ -895,81 +911,81 @@ class FrontpageController extends Controller
                 return back()->with('error', 'You are a robot');
             }
         }
-     
+
     }
 
     public function expedition(Request $request)
     {
-        $item= ActivityModel::where('uri',$request->uri)->first();
-        $data = ActivityModel::find($item->id)->trips()->where('status','1')->orderBy('ordering','asc')->get(); 
-        return view('themes.default.expedition', compact('data','item'));
+        $item = ActivityModel::where('uri', $request->uri)->first();
+        $data = ActivityModel::find($item->id)->trips()->where('status', '1')->orderBy('ordering', 'asc')->get();
+        return view('themes.default.expedition', compact('data', 'item'));
     }
     public function package($uri)
     {
-        $item= ActivityModel::where('uri',$uri)->first();
-        $data = ActivityModel::find($item->id)->trips()->where('status','1')->orderBy('ordering','asc')->paginate(4);
+        $item = ActivityModel::where('uri', $uri)->first();
+        $data = ActivityModel::find($item->id)->trips()->where('status', '1')->orderBy('ordering', 'asc')->paginate(4);
         // dd($uri,$item,$data);
-        return view('themes.default.package', compact('data','item'));
+        return view('themes.default.package', compact('data', 'item'));
     }
     public function packageDetail($uri)
     {
-        $item = TripModel::where('uri',$uri)->first();
+        $item = TripModel::where('uri', $uri)->first();
         if ($item->id) {
             $itinerary = $item->itineraries()->orderBy('ordering', 'asc')->get();
         }
-        $data = $item->activities()->first(); 
-        $setting = SettingModel::where('id',1)->first();
+        $data = $item->activities()->first();
+        $setting = SettingModel::where('id', 1)->first();
         // dd($uri,$item,$data);
-        return view('themes.default.packagedetail', compact('item','data','itinerary','setting'));
+        return view('themes.default.packagedetail', compact('item', 'data', 'itinerary', 'setting'));
     }
 
     public function tour()
     {
         $data = DestinationModel::where('status', '1')->get();
-        $destination= PostTypeModel::where('id', '29')->first();
-        return view('themes.default.tour', compact('data','destination'));
+        $destination = PostTypeModel::where('id', '29')->first();
+        return view('themes.default.tour', compact('data', 'destination'));
     }
 
-    public function trekking(Request $request)  
+    public function trekking(Request $request)
     {
-        $item= ActivityModel::where('uri',$request->uri)->first();
-        $data = ActivityModel::find($item->id)->trips()->where('status','1')->orderBy('ordering','asc')->paginate(8);
-        return view('themes.default.trekking', compact('data','item'));
+        $item = ActivityModel::where('uri', $request->uri)->first();
+        $data = ActivityModel::find($item->id)->trips()->where('status', '1')->orderBy('ordering', 'asc')->paginate(8);
+        return view('themes.default.trekking', compact('data', 'item'));
     }
 
     public function activitylist()
     {
-        $data = ActivityModel::where('activity_parent','activity')->orderBy('ordering','asc')->paginate(6);
-        $trips = $data->flatMap(function ($activity){
+        $data = ActivityModel::where('activity_parent', 'activity')->orderBy('ordering', 'asc')->paginate(6);
+        $trips = $data->flatMap(function ($activity) {
             return $activity->trips;
         })->take(3);
         // dd($data,$trips);
-        return view('themes.default.activitylist', compact('data','trips'));
+        return view('themes.default.activitylist', compact('data', 'trips'));
     }
     public function trekkinglist()
     {
         $parent = ActivityModel::where(['activity_parent' => 'activity', 'id' => '59'])->first();
-        $data = ActivityModel::where('activity_parent','trekking')->orderBy('ordering','asc')->get();
-        $trips = $data->flatMap(function ($activity){
+        $data = ActivityModel::where('activity_parent', 'trekking')->orderBy('ordering', 'asc')->get();
+        $trips = $data->flatMap(function ($activity) {
             return $activity->trips;
         })->take(3);
-        return view('themes.default.trekkinglist', compact('parent','data','trips'));
+        return view('themes.default.trekkinglist', compact('parent', 'data', 'trips'));
     }
     public function expeditionlist()
     {
         $parent = ActivityModel::where(['activity_parent' => 'activity', 'id' => '58'])->first();
-        $data = ActivityModel::where('activity_parent','expedition')->orderBy('ordering','asc')->get();
-        $trips = $data->flatMap(function ($activity){
+        $data = ActivityModel::where('activity_parent', 'expedition')->orderBy('ordering', 'asc')->get();
+        $trips = $data->flatMap(function ($activity) {
             return $activity->trips;
         })->take(3);
-        return view('themes.default.expeditionlist', compact('parent','data','trips'));
+        return view('themes.default.expeditionlist', compact('parent', 'data', 'trips'));
     }
     public function blog($uri)
     {
         $item = PostModel::where(['uri' => $uri])->first();
-        $blog = PostTypeModel::where('id',$item->post_type)->first();
-        $related = PostModel::where(['post_type' => $blog->id])->where('uri','!=',$uri)->take(6)->get();
-        return view('themes.default.blogdetail', compact('blog','related','item'));
+        $blog = PostTypeModel::where('id', $item->post_type)->first();
+        $related = PostModel::where(['post_type' => $blog->id])->where('uri', '!=', $uri)->take(6)->get();
+        return view('themes.default.blogdetail', compact('blog', 'related', 'item'));
     }
     public function relatedlist($tripId)
     {
@@ -979,22 +995,21 @@ class FrontpageController extends Controller
                 $query->where('trip_id', $item->id);
             })->first();
         }
-        $similar_tripsId= $item->relatedtrips()->pluck('related_trip_id');
+        $similar_tripsId = $item->relatedtrips()->pluck('related_trip_id');
 
         if ($similar_tripsId->isNotEmpty()) {
             $data = TripModel::whereIn('id', $similar_tripsId)->paginate(8);
-        }
-        else{
+        } else {
             $data = TripModel::where('uri', '!=', $tripId)->orderBy('ordering', 'desc')->paginate(8, ['*'], 'page', null, 16);
         }
-        return view('themes.default.relatedlist', compact('data','item','parent'));
+        return view('themes.default.relatedlist', compact('data', 'item', 'parent'));
     }
 
     public function teamlist($uri)
     {
-        $team = TeamCategory::where(['uri' => $uri])->first(); 
-        $team_cat = TeamCategory::where('team_parent','0')->get();
-        $category2 = TeamCategory::where('team_parent','4')->orderBy('ordering', 'asc')->get();
+        $team = TeamCategory::where(['uri' => $uri])->first();
+        $team_cat = TeamCategory::where('team_parent', '0')->get();
+        $category2 = TeamCategory::where('team_parent', '4')->orderBy('ordering', 'asc')->get();
         $first_team = TeamModel::where(['category' => $team->id, 'status' => '1'])->orderBy('ordering', 'asc')->get();
 
         if ($team->id == '1') {
@@ -1002,18 +1017,71 @@ class FrontpageController extends Controller
         } elseif ($team->id == '2') {
             return view('themes.default.team-international', compact('team', 'team_cat', 'first_team'));
         } else {
-            return view('themes.default.team-staffs', compact('team', 'team_cat', 'first_team','category2'));
+            return view('themes.default.team-staffs', compact('team', 'team_cat', 'first_team', 'category2'));
         }
     }
 
     public function teamdetail($uri)
     {
-        $data = TeamModel::where(['uri'=> $uri])->orWhere('team_key', $uri)->first();
-        
-        $certificates = $data->certificates()->orderBy('ordering','asc')->get();
-        $related=$relatedData = TeamModel::where('id', '!=', optional($data)->id)
-        ->where('category', optional($data)->category)
-        ->get();
-        return view('themes.default.team-single', compact('data',  'certificates','related'));
+        $data = TeamModel::where(['uri' => $uri])->orWhere('team_key', $uri)->first();
+
+        $certificates = $data->certificates()->orderBy('ordering', 'asc')->get();
+        $related = $relatedData = TeamModel::where('id', '!=', optional($data)->id)
+            ->where('category', optional($data)->category)
+            ->get();
+        return view('themes.default.team-single', compact('data', 'certificates', 'related'));
+    }
+
+    public function sitemap()
+    {
+        $sitemap = Sitemap::create();
+
+        // Home
+        $sitemap->add(Url::create(url('/'))->setPriority(1.0));
+
+        // Trips
+        $trips = TripModel::select('uri', 'updated_at')->where('status', 1)->get();
+
+        foreach ($trips as $trip) {
+            $sitemap->add(
+                Url::create(url("/trip/{$trip->uri}"))
+                    ->setLastModificationDate($trip->updated_at)
+                    ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                    ->setPriority(0.9)
+            );
+        }
+
+        // Blogs
+        $posts = PostModel::select('uri', 'updated_at')->where('status', 1)->where('post_type', 33)->get();
+
+        foreach ($posts as $post) {
+            $sitemap->add(
+                Url::create(url("/blog/{$post->uri}"))
+                    ->setLastModificationDate($post->updated_at)
+                    ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+                    ->setPriority(0.8)
+            );
+        }
+        $others = PostModel::select('uri', 'updated_at')->where('status', 1)->where('post_type', 24)->get();
+
+        foreach ($others as $post) {
+            $sitemap->add(
+                Url::create(url("/page/{$post->uri}"))
+                    ->setLastModificationDate($post->updated_at)
+                    ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+                    ->setPriority(0.8)
+            );
+        }
+
+        // Dynamic Pages
+        $pages = PostTypeModel::where('is_menu', 1)->orderBy('ordering', 'asc')->get();
+
+        foreach ($pages as $page) {
+            $sitemap->add(
+                Url::create(url("/{$page->uri}"))
+                    ->setPriority(0.8)
+            );
+        }
+        return $sitemap->toResponse(request());
     }
 }
