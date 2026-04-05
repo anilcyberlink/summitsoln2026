@@ -1,7 +1,7 @@
 <div class=" bg-pattern-footer " style="background-position: center;padding-top: 60px;" uk-scrollspy="cls: uk-animation-fade;  delay: 300; repeat: false">
     <div class="uk-text-center uk-margin-top uk-container" style="overflow: hidden;">
         <h3 class="text-black ">Affiliations</h3>
-        <img src="{{asset('theme-assets/img/blue-line.png')}}" loading="lazy" alt="underline-img"> 
+        <img src="{{asset('theme-assets/img/blue-line.png')}}" loading="lazy" alt="underline-img">
         <div class="uk-slider-container-offset" uk-slider>
             <div class="uk-position-relative uk-visible-toggle uk-light" tabindex="-1">
                 <div class="uk-slider-items uk-child-width-1-2 uk-child-width-1-3@m uk-child-width-1-4@l uk-grid-match uk-grid uk-margin-large-top">
@@ -109,7 +109,7 @@
                     <p class="uk-margin-remove "><a class="text-secondary f-20 fw-600 uk-text-uppercase ">Links</a></p>
                     <ul class=" footer-list">
                         @if($post_types)
-                            @foreach ($post_types as $item)       
+                            @foreach ($post_types as $item)
                                 <li><a href="{{route('page.posttype_detail',$item->uri)}}">{{ $item->post_type }}</a></li>
                             @endforeach
                         @endif
@@ -122,8 +122,8 @@
 
 <div class="small-footer uk-child-width-1-2@m uk-padding uk-padding-remove-vertical uk-flex uk-flex-middle " uk-grid >
     <div class="uk-text-center uk-text-left@m uk-margin-top" uk-scrollspy="cls: uk-animation-fade;  delay: 300; repeat: false">
-        <a href="{{ url(geturl($term_condition->uri, $term_condition->page_key)) }}" class="text-white uk-margin-large-right">{{$term_condition->post_title}}</a>
-        <a href="{{ url(geturl($privacy->uri, $privacy->page_key)) }}" class="text-white">{{$privacy->post_title}}</a>
+        <a href="{{ url('page/'. geturl($term_condition->uri, $term_condition->page_key)) }}" class="text-white uk-margin-large-right">{{$term_condition->post_title}}</a>
+        <a href="{{ url('page/'. geturl($privacy->uri, $privacy->page_key)) }}" class="text-white">{{$privacy->post_title}}</a>
     </div>
     <div class="uk-footer-icon uk-text-right@m uk-text-center uk-margin-top uk-margin-bottom" uk-scrollspy="cls: uk-animation-fade;  delay: 300; repeat: false">
         <a href="{{$setting->instagram_link}}" target="_blank" class="uk-icon-button uk-margin-small-right" uk-icon="instagram"></a>

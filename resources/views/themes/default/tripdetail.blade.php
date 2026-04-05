@@ -16,7 +16,7 @@
                 @endif
             </ul>
             <h2 class="text-secondary uk-margin-remove">{{ $data->trip_title }}</h2>
-        
+
         <p class="text-white fw-600 uk-width-2-3@m uk-width-1-1">{{ $data->sub_title }}</p>
     </div>
 </section>
@@ -387,7 +387,7 @@
 <!-- gallery section start -->
 @if ($photo_videos->count() > 0)
     <section class="uk-section uk-padding-remove-bottom" id="gallery">
-        
+
         <div class="uk-container uk-margin-top">
             <div>
                 <h2 class="text-primary uk-margin-remove-top">Gallery</h2>
@@ -487,7 +487,7 @@
                                         <textarea name="message" class="uk-textarea" rows="3" required></textarea>
                                     </div>
                                 </div>
-                                <div class="uk-text-center uk-margin-top"> 
+                                <div class="uk-text-center uk-margin-top">
                                 <button type="submit" class="uk-btn1 uk-btn-primary-outline">Submit<span uk-icon="chevron-right"></span></button>
                                 </div>
                             </form>
@@ -573,7 +573,7 @@
                 @foreach($similar_trips as $item)
                     <div class="uk-margin-medium-bottom">
                         <div class="uk-card uk-card-default bg-primary border">
-                            <a href="{{ url('page/' . tripurl($item->uri)) }}">
+                            <a href="{{ url('trip/' . tripurl($item->uri)) }}">
                                 <div class="uk-card-media-top uk-230">
                                     <img src="{{$item->thumbnail ? asset('uploads/original/'.$item->thumbnail) : asset('theme-assets/img/slider1.jpeg')}}" loading="lazy" alt="{{$item->trip_title}}" class="border">
                                 </div>
@@ -581,12 +581,12 @@
                             <div class="uk-card-body uk-padding-small border bg-primary">
                                 <h3 class="uk-card-title text-white">{{$item->trip_title}}</h3>
                                 <div>
-                                    <span class="uk-package-badge">{{ $item->duration }}</span> 
-                                    <span class="uk-package-badge uk-margin-vertical">{{ grade_message_trek($item->trip_grade) }}</span> 
+                                    <span class="uk-package-badge">{{ $item->duration }}</span>
+                                    <span class="uk-package-badge uk-margin-vertical">{{ grade_message_trek($item->trip_grade) }}</span>
                                     <span class="uk-package-badge">{{$item->max_altitude}}</span>
                                 </div>
                                 <p class="text-white f-14 fw-500">{{$item->sub_title}}</p>
-                                <a href="{{ url('page/' . tripurl($item->uri)) }}">
+                                <a href="{{ url('trip/' . tripurl($item->uri)) }}">
                                     <div class="uk-btn1 uk-btn-primary uk-width-1-1 uk-flex uk-flex-middle uk-flex-between p-btn">Learn More <span uk-icon="chevron-right"></span>
                                     </div>
                                 </a>
