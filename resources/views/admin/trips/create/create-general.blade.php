@@ -10,7 +10,7 @@
                     <div class="col-lg-12">
                         <div class="bs-component">
                             <input type="text" id="trip_title" name="trip_title" class="form-control"
-                                placeholder="Trip Title" value="{{ old('trip_title') }}" />
+                                placeholder="Trip Title" value="{{ old('trip_title') }}" required/>
                             <input type="hidden" id="uri" name="uri" value="" />
                         </div>
                     </div>
@@ -35,8 +35,8 @@
                         <div class="bs-component">
                             <label>Trip Difficulty</label>
                             @if ($trek->count() > 0)
-                                <select class="form-control" name="trip_grade">
-                                    <option value=""> Select Grade </option>
+                                <select class="form-control" name="trip_grade" required>
+                                    <option value="" disabled selected> Select Grade </option>
                                     @foreach ($trek as $row)
                                         <option value="{{ $row->id }}">{{ $row->trip_grade }} </option>
                                     @endforeach
@@ -163,7 +163,7 @@
                     {{-- <div class="col-lg-6">
                         <div class="bs-component">
                             <label>Is Famous ?</label>
-                            <select class="form-control" name="video_status">  
+                            <select class="form-control" name="video_status">
                                 <option value="0">No</option>
                                 <option value="1">Yes</option>
                             </select>
@@ -259,8 +259,8 @@
             <div class="sid_bvijay mb10">
                 <h4> Trip Type </h4>
                 <div class="hd_show_con">
-                    <select class="form-control onchange-select" name="trip_type">
-                        <option value="0"> Select Trip Type </option>
+                    <select class="form-control onchange-select" name="trip_type" required>
+                        <option value="" selected disabled> Select Trip Type </option>
                         @foreach ($trip_type as $row)
                             @if($row->trip_type != 'Package')
                                 <option value="{{ $row->id }}">{{ $row->trip_type }}</option>
@@ -274,7 +274,7 @@
                 <h4> Regions </h4>
                 <div class="hd_show_con">
                 <div class=" has-feedback has-search">
-                  <input class="category-search form-control" type="text" placeholder="Search.."> 
+                  <input class="category-search form-control" type="text" placeholder="Search..">
                   <span class="glyphicon glyphicon-search form-control-feedback"></span>
                     </div>
                     <div class="tab-content mb15">
@@ -294,7 +294,7 @@
                         </div>
                     </div>
                 </div>
-            </div> 
+            </div>
            <div class="sid_bvijay mb10">
             <h4> Trip Groups </h4>
             <div class="hd_show_con">
@@ -331,7 +331,7 @@
                                             <label class="option">
                                                 <input type="radio" name="destination[]"
                                                     value="{{ $row->id }}"
-                                                    @if (is_array(old('destination')) && in_array($row->id, old('destination'))) checked @endif />
+                                                    @if (is_array(old('destination')) && in_array($row->id, old('destination'))) checked @endif required/>
                                                 <span class="checkbox"></span> {{ $row->title }}
                                             </label>
                                         </li>
@@ -358,7 +358,7 @@
                                             <li>
                                                 <label class="option">
                                                     <input type="radio" name="activity[]"
-                                                        value="{{ $row->id }}">
+                                                        value="{{ $row->id }}" required>
                                                     <span class="checkbox"></span> {{ $row->title }}
                                                 </label>
                                             </li>

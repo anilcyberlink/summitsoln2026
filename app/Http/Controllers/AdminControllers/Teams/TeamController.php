@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\AdminControllers\Teams;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Team\TeamCategory;
 use App\Models\Team\TeamModel;
 use App\Models\Team\Certificates;
+use Illuminate\Support\Str;
 use Image;
 
 class TeamController extends Controller
@@ -19,11 +19,11 @@ class TeamController extends Controller
      */
     public function index()
     {
-         $bod = TeamModel::where('category','1')->orderBy('id','desc')->get();
-         $int = TeamModel::where('category','2')->orderBy('id','desc')->get();
-         $office = TeamModel::where('category','3')->orderBy('id','desc')->get();
-         $field = TeamModel::where('category','4')->orderBy('id','desc')->get();
-        return view('admin.team.index', compact('bod','int','office','field'));
+        $bod = TeamModel::where('category', '1')->orderBy('id', 'desc')->get();
+        $int = TeamModel::where('category', '2')->orderBy('id', 'desc')->get();
+        $office = TeamModel::where('category', '3')->orderBy('id', 'desc')->get();
+        $field = TeamModel::where('category', '4')->orderBy('id', 'desc')->get();
+        return view('admin.team.index', compact('bod', 'int', 'office', 'field'));
     }
 
     /**
@@ -33,11 +33,11 @@ class TeamController extends Controller
      */
     public function create()
     {
-        $certificates = Certificates::all(); 
-        $category = TeamCategory::where('team_parent','0')->get();
+        $certificates = Certificates::all();
+        $category = TeamCategory::where('team_parent', '0')->get();
         $ordering = TeamModel::max('ordering');
         $ordering = $ordering + 1;
-        return view('admin.team.create', compact('category','ordering','certificates'));
+        return view('admin.team.create', compact('category', 'ordering', 'certificates'));
     }
 
     /**
@@ -51,79 +51,73 @@ class TeamController extends Controller
 
         if ($request->ajax()) {
             // dd($request->all());
-        $request->validate([
-          'name'=>'required',                
-        ]);
+            $request->validate([
+                'name' => 'required',
+            ]);
 
-        $banner_width = env('BANNER_WIDTH');
-        $banner_height = env('BANNER_HEIGHT');
+            $banner_width = env('BANNER_WIDTH');
+            $banner_height = env('BANNER_HEIGHT');
 
-        // $thumbnail_width = env('BANNER_WIDTH');
-        // $thumbnail_height = env('BANNER_HEIGHT');
+            // $thumbnail_width = env('BANNER_WIDTH');
+            // $thumbnail_height = env('BANNER_HEIGHT');
 
-        $data = $request->all();           
+            $data = $request->all();
 
-        /*************Banner Upload************/
-        $file =  $request->file('banner');
-        $banner_name = '';
-        if($request->hasfile('banner')){
-        $banner = $request->file('banner')->getClientOriginalName();
-        $extension = $request->file('banner')->getClientOriginalExtension();
-        $banner = explode('.', $banner);
-        $banner_name = Str::slug($banner[0]) . '-' . Str::random(40) . '.' . $extension;
+            /*************Banner Upload************/
+            $file = $request->file('banner');
+            $banner_name = '';
+            if ($request->hasfile('banner')) {
+                $banner = $request->file('banner')->getClientOriginalName();
+                $banner = explode('.', $banner);
+                $banner_name = Str::slug($banner[0]) . '-' . Str::random(5) . '.webp';
 
-        $destinationPath = public_path('uploads/team');
+                $destinationPath = public_path('uploads/team');
 
-        $banner_picture = Image::make($file->getRealPath());
-        //$width = Image::make($file->getRealPath())->width();
-        //$height = Image::make($file->getRealPath())->height();     
-        $banner_picture->resize($banner_width, $banner_height, function($constraint){
-          $constraint->aspectRatio();
-        })->save($destinationPath .'/'. $banner_name ); 
-      }
+                $banner_picture = Image::make($file->getRealPath());
+                $banner_picture->resize($banner_width, $banner_height, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->encode('webp', 90)->save($destinationPath . '/' . $banner_name);
+            }
 
-      /******Upload Thumbnail******/
-      $thumb_file =  $request->file('thumbnail');
-      $thumbnail_name = '';
-        if($request->hasfile('thumbnail')){
-        $thumbnail = $request->file('thumbnail')->getClientOriginalName();
-        $extension = $request->file('thumbnail')->getClientOriginalExtension();
-        $thumbnail = explode('.', $thumbnail);
-        $thumbnail_name = Str::slug($thumbnail[0]) . '-' . Str::random(40) . '.' . $extension;
+            /******Upload Thumbnail******/
+            $thumb_file = $request->file('thumbnail');
+            $thumbnail_name = '';
+            if ($request->hasfile('thumbnail')) {
+                $thumbnail = $request->file('thumbnail')->getClientOriginalName();
+                // $extension = $request->file('thumbnail')->getClientOriginalExtension();
+                $thumbnail = explode('.', $thumbnail);
+                $thumbnail_name = Str::slug($thumbnail[0]) . '-' . Str::random(5) . '.webp';
 
-        $destinationPath = public_path('uploads/team');
+                $destinationPath = public_path('uploads/team');
 
-        $thumbnail_picture = Image::make($thumb_file->getRealPath());
-        $width = Image::make($thumb_file->getRealPath())->width();
-        $height = Image::make($thumb_file->getRealPath())->height();     
-        $thumbnail_picture->resize($width, $height, function($constraint){
-          $constraint->aspectRatio();
-        })->save($destinationPath .'/'. $thumbnail_name ); 
-      }
-      /*****************************/
+                $thumbnail_picture = Image::make($thumb_file->getRealPath());
+                $width = Image::make($thumb_file->getRealPath())->width();
+                $height = Image::make($thumb_file->getRealPath())->height();
+                $thumbnail_picture->resize($width, $height, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->encode('webp', 90)->save($destinationPath . '/' . $thumbnail_name);
+            }
+            /*****************************/
 
-       $data['team_key'] = time().rand(500000,999999999);
-      $data['uri'] = Str::slug($request->uri); 
-      $data['banner'] = $banner_name;     
-      $data['thumbnail'] = $thumbnail_name;    
-       
-      
-      $is_draft  = '0';
-      if($request->submit == 'publish'){
-        $is_draft = '0';
-      }else if($request->submit == 'draft'){
-        $is_draft = '1';
-      }
-       $isChecked = $request->has('published');       
-      $data['published'] = ($isChecked)?'1':'0';
-      $data['is_draft'] = $is_draft; 
-      $result = TeamModel::create($data);
-      $last_id = $result->id;
+            $data['team_key'] = time() . rand(500000, 999999999);
+            $data['uri'] = Str::slug($request->uri);
+            $data['banner'] = $banner_name;
+            $data['thumbnail'] = $thumbnail_name;
 
-      
 
-      
-       // Insert into Certificates
+            $is_draft = '0';
+            if ($request->submit == 'publish') {
+                $is_draft = '0';
+            } else if ($request->submit == 'draft') {
+                $is_draft = '1';
+            }
+            $isChecked = $request->has('published');
+            $data['published'] = ($isChecked) ? '1' : '0';
+            $data['is_draft'] = $is_draft;
+            $result = TeamModel::create($data);
+            $last_id = $result->id;
+
+            // Insert into Certificates
             if (isset($request->certificates_ordering)) {
                 $gear_keys = array_keys($request->certificates_ordering);
                 $sn_gear = 1;
@@ -136,22 +130,22 @@ class TeamController extends Controller
                     $MemberCertificate->team_id = $last_id;
                     $thumb_file = $request->file('image');
                     if (isset($thumb_file[$value])) {
-                        $thumb = time() . '-' . Str::random(15) . $thumb_file[$value]->getClientOriginalName();
+                        $thumb = time() . '-' . Str::random(5) . $thumb_file[$value]->getClientOriginalName();
                         $destinationPath = public_path('uploads/team');
                         $thumb_file[$value]->move($destinationPath, $thumb);
                         $MemberCertificate->image = $thumb;
                     }
-             $MemberCertificate->ordering = $request->certificates_ordering[$key];   
-            $MemberCertificate->title = $request->certificates_title[$key];  
+                    $MemberCertificate->ordering = $request->certificates_ordering[$key];
+                    $MemberCertificate->title = $request->certificates_title[$key];
                     $MemberCertificate->save();
                     $sn_gear++;
                 }
             }
 
 
-      return response()->json(['status' => 'success', 'message' => 'Member Added Successfully']);
-    }
-    return false;
+            return response()->json(['status' => 'success', 'message' => 'Member Added Successfully']);
+        }
+        return false;
 
     }
 
@@ -175,10 +169,10 @@ class TeamController extends Controller
      */
     public function edit($id)
     {
-        $data = TeamModel::find($id);    
+        $data = TeamModel::find($id);
         $certificates = $data->certificates()->get();
-        $category = TeamCategory::where('team_parent','0')->get();
-        return view('admin.team.edit',compact('data','certificates','category'));
+        $category = TeamCategory::where('team_parent', '0')->get();
+        return view('admin.team.edit', compact('data', 'certificates', 'category'));
     }
 
     /**
@@ -189,99 +183,96 @@ class TeamController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {    
-      if ($request->ajax()) {  
+    {
+        if ($request->ajax()) {
 
-        $is_draft = 0;
-        if($request->submit == 'publish'){
-          $is_draft = 0;
-        }else if($request->submit == 'draft'){
-          $is_draft = 1;
-        }
-      
-      $banner_width = env('BANNER_WIDTH');
-      $banner_height = env('BANNER_HEIGHT');
+            $is_draft = 0;
+            if ($request->submit == 'publish') {
+                $is_draft = 0;
+            } else if ($request->submit == 'draft') {
+                $is_draft = 1;
+            }
 
-      $data = TeamModel::find($id);  
-      
-      $file =  $request->file('banner');
-      $thumbnail_file =  $request->file('thumbnail');    
-      $banner_name = '';
-      $thumbnail_name = '';
-     
-      if($request->hasfile('banner')){
-        $data = TeamModel::find($id); 
-        if($data->banner){
-          if(file_exists(env('PUBLIC_PATH').'uploads/team/' . $data->banner)){
-            unlink(env('PUBLIC_PATH').'uploads/team/' . $data->banner);
-          }
-        }
-        $banner = $request->file('banner')->getClientOriginalName();
-        $extension = $request->file('banner')->getClientOriginalExtension();
-        $banner = explode('.', $banner);
-        $banner_name = Str::slug($banner[0]) . '-' . Str::random(40) . '.' . $extension;
-        $destinationPath = public_path('uploads/team');
-        $banner_picture = Image::make($file->getRealPath());
-        $width = Image::make($file->getRealPath())->width();
-        $height = Image::make($file->getRealPath())->height();    
+            $banner_width = env('BANNER_WIDTH');
+            $banner_height = env('BANNER_HEIGHT');
 
-        $banner_picture->resize($banner_width, $banner_height, function($constraint){
-          $constraint->aspectRatio();
-        })->save($destinationPath .'/'. $banner_name ); 
-        $data->banner = $banner_name;
-      }  
+            $data = TeamModel::find($id);
 
-      /*****Thumbnail*****/
-      if($request->hasfile('thumbnail')){
-        $data = TeamModel::find($id); 
-        if($data->thumbnail){
-          if(file_exists(env('PUBLIC_PATH').'uploads/team/' . $data->thumbnail)){
-            unlink(env('PUBLIC_PATH').'uploads/team/' . $data->thumbnail);
-          }
-        }
-        $thumbnail = $request->file('thumbnail')->getClientOriginalName();
-        $extension = $request->file('thumbnail')->getClientOriginalExtension();
-        $thumbnail = explode('.', $thumbnail);
-        $thumbnail_name = Str::slug($thumbnail[0]) . '-' . Str::random(40) . '.' . $extension;
-        $destinationPath = public_path('uploads/team');
-        $thumbnail_picture = Image::make($thumbnail_file->getRealPath());
-        $width = Image::make($thumbnail_file->getRealPath())->width();
-        $height = Image::make($thumbnail_file->getRealPath())->height();    
+            $file = $request->file('banner');
+            $thumbnail_file = $request->file('thumbnail');
+            $banner_name = '';
+            $thumbnail_name = '';
 
-        $thumbnail_picture->resize($width, $height, function($constraint){
-          $constraint->aspectRatio();
-        })->save($destinationPath .'/'. $thumbnail_name ); 
-        $data->thumbnail = $thumbnail_name;
-      }   
+            if ($request->hasfile('banner')) {
+                $data = TeamModel::find($id);
+                if ($data->banner) {
+                    if (file_exists(env('PUBLIC_PATH') . 'uploads/team/' . $data->banner)) {
+                        unlink(env('PUBLIC_PATH') . 'uploads/team/' . $data->banner);
+                    }
+                }
+                $banner = $request->file('banner')->getClientOriginalName();
+                // $extension = $request->file('banner')->getClientOriginalExtension();
+                $banner = explode('.', $banner);
+                $banner_name = Str::slug($banner[0]) . '-' . Str::random(5) . '.webp';
+                $destinationPath = public_path('uploads/team');
+                $banner_picture = Image::make($file->getRealPath());
+                $width = Image::make($file->getRealPath())->width();
+                $height = Image::make($file->getRealPath())->height();
 
-       $data['team_key'] = time().rand(500000,999999999);
-      $data->name = $request->name;
-      $data->position = $request->position;
-      $data->category = $request->category;
-       $data->subcategory = $request->subcategory;  
-      $data->phone = $request->phone;
-      $data->email = $request->email;
-      $data->brief = $request->brief; 
-      $data->content = $request->content; 
-      $data->ordering = $request->ordering; 
-      $data->fb_url = $request->fb_url; 
-      $data->instagram_url = $request->instagram_url; 
-      $data->twitter_url = $request->twitter_url; 
-      $data->linkedin_url = $request->linkedin_url;
-       $data->uri = Str::slug($request->uri);
-        $isChecked = $request->has('published');
-      $data->published = ($isChecked)?'1':'0';   
-      $isChecked = $request->has('status');
-      $data->status = ($isChecked)?'1':'0';     
-      $data->is_draft = $is_draft;      
-      $_data = TeamModel::find($id);
-        
+                $banner_picture->resize($banner_width, $banner_height, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->encode('webp', 90)->save($destinationPath . '/' . $banner_name);
+                $data->banner = $banner_name;
+            }
 
-   
-    
-      // Update Certificates        
-     
-     if (isset($request->certificates_id)) {
+            /*****Thumbnail*****/
+            if ($request->hasfile('thumbnail')) {
+                $data = TeamModel::find($id);
+                if ($data->thumbnail) {
+                    if (file_exists(env('PUBLIC_PATH') . 'uploads/team/' . $data->thumbnail)) {
+                        unlink(env('PUBLIC_PATH') . 'uploads/team/' . $data->thumbnail);
+                    }
+                }
+                $thumbnail = $request->file('thumbnail')->getClientOriginalName();
+                // $extension = $request->file('thumbnail')->getClientOriginalExtension();
+                $thumbnail = explode('.', $thumbnail);
+                $thumbnail_name = Str::slug($thumbnail[0]) . '-' . Str::random(5) . '.webp';
+                $destinationPath = public_path('uploads/team');
+                $thumbnail_picture = Image::make($thumbnail_file->getRealPath());
+                $width = Image::make($thumbnail_file->getRealPath())->width();
+                $height = Image::make($thumbnail_file->getRealPath())->height();
+
+                $thumbnail_picture->resize($width, $height, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->encode('webp', 90)->save($destinationPath . '/' . $thumbnail_name);
+                $data->thumbnail = $thumbnail_name;
+            }
+
+            $data['team_key'] = time() . rand(500000, 999999999);
+            $data->name = $request->name;
+            $data->position = $request->position;
+            $data->category = $request->category;
+            $data->subcategory = $request->subcategory;
+            $data->phone = $request->phone;
+            $data->email = $request->email;
+            $data->brief = $request->brief;
+            $data->content = $request->content;
+            $data->ordering = $request->ordering;
+            $data->fb_url = $request->fb_url;
+            $data->instagram_url = $request->instagram_url;
+            $data->twitter_url = $request->twitter_url;
+            $data->linkedin_url = $request->linkedin_url;
+            $data->uri = Str::slug($request->uri);
+            $isChecked = $request->has('published');
+            $data->published = ($isChecked) ? '1' : '0';
+            $isChecked = $request->has('status');
+            $data->status = ($isChecked) ? '1' : '0';
+            $data->is_draft = $is_draft;
+            $_data = TeamModel::find($id);
+
+            // Update Certificates
+
+            if (isset($request->certificates_id)) {
                 $certificates_keys = array_keys($request->certificates_id);
                 $sn_certificates = 1;
                 $sn_certificate_count = count($request->certificates_id);
@@ -302,8 +293,8 @@ class TeamController extends Controller
                             $certificateData->image = $thumb;
                         }
                         $certificateData->ordering = $request->certificates_ordering[$key];
-                        $certificateData->title = $request->certificates_title[$key];                       
-                       
+                        $certificateData->title = $request->certificates_title[$key];
+
                         $certificateData->save();
                     } else if ($request->certificates_id[$value] !== null && $request->certificates_id[$value] !== "") {
                         $certificates_id = $request->certificates_id[$value];
@@ -325,7 +316,7 @@ class TeamController extends Controller
                         }
                         $certificateData->team_id = $data->id;
                         $certificateData->ordering = $request->certificates_ordering[$key];
-                        $certificateData->title = $request->certificates_title[$key];                    
+                        $certificateData->title = $request->certificates_title[$key];
                         $certificateData->save();
                     }
 
@@ -333,10 +324,10 @@ class TeamController extends Controller
                 }
             }
 
-      $data->save();
-      return response()->json(['status' => 'success', 'message' => 'Member Updated Successful!']);
-    }
-    return false;
+            $data->save();
+            return response()->json(['status' => 'success', 'message' => 'Member Updated Successful!']);
+        }
+        return false;
 
     }
 
@@ -348,59 +339,59 @@ class TeamController extends Controller
      */
     public function destroy($id)
     {
-        
-         $data = TeamModel::find($id);
-      if($data->banner  != NULL){
-        if(file_exists(env('PUBLIC_PATH').'uploads/team/' . $data->banner)){
-          unlink(env('PUBLIC_PATH').'uploads/team/' . $data->banner);
+
+        $data = TeamModel::find($id);
+        if ($data->banner != NULL) {
+            if (file_exists(env('PUBLIC_PATH') . 'uploads/team/' . $data->banner)) {
+                unlink(env('PUBLIC_PATH') . 'uploads/team/' . $data->banner);
+            }
         }
-      }    
-      if($data->thumbnail  != NULL){
-        if(file_exists(env('PUBLIC_PATH').'uploads/team/' . $data->thumbnail)){
-          unlink(env('PUBLIC_PATH').'uploads/team/' . $data->thumbnail);
+        if ($data->thumbnail != NULL) {
+            if (file_exists(env('PUBLIC_PATH') . 'uploads/team/' . $data->thumbnail)) {
+                unlink(env('PUBLIC_PATH') . 'uploads/team/' . $data->thumbnail);
+            }
         }
-      }      
-    
-      $data->certificates()->delete();
-      $data->delete();
-      return 'Are you sure to delete?';
+
+        $data->certificates()->delete();
+        $data->delete();
+        return 'Are you sure to delete?';
     }
 
- 
 
-     public function certificatesdestroy($team_id,$id)
+
+    public function certificatesdestroy($team_id, $id)
     {
         $data = Certificates::find($id);
-         if($data->image  != NULL){
-            unlink('uploads/team/' . $data->image );
+        if ($data->image != NULL) {
+            unlink('uploads/team/' . $data->image);
         }
         $data->delete();
-        return 'Are you sure to delete?';    
+        return 'Are you sure to delete?';
     }
 
-     public function thumbdelete($id)
+    public function thumbdelete($id)
     {
         $data = TeamModel::find($id);
-     if($data->thumbnail){      
-      if(file_exists(env('PUBLIC_PATH').'uploads/team/' . $data->thumbnail)){
-        unlink(env('PUBLIC_PATH').'uploads/team/' . $data->thumbnail);
-      }
-    }
-    $data->thumbnail = NULL;
-    $data->save();
-    return response('Delete Successful.');
+        if ($data->thumbnail) {
+            if (file_exists(env('PUBLIC_PATH') . 'uploads/team/' . $data->thumbnail)) {
+                unlink(env('PUBLIC_PATH') . 'uploads/team/' . $data->thumbnail);
+            }
+        }
+        $data->thumbnail = NULL;
+        $data->save();
+        return response('Delete Successful.');
     }
 
-     public function bannerdelete($id)
+    public function bannerdelete($id)
     {
         $data = TeamModel::find($id);
-     if($data->banner){      
-      if(file_exists(env('PUBLIC_PATH').'uploads/team/' . $data->banner)){
-        unlink(env('PUBLIC_PATH').'uploads/team/' . $data->banner);
-      }
-    }
-    $data->banner = NULL;
-    $data->save();
-    return response('Delete Successful.');
+        if ($data->banner) {
+            if (file_exists(env('PUBLIC_PATH') . 'uploads/team/' . $data->banner)) {
+                unlink(env('PUBLIC_PATH') . 'uploads/team/' . $data->banner);
+            }
+        }
+        $data->banner = NULL;
+        $data->save();
+        return response('Delete Successful.');
     }
 }
