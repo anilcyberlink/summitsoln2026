@@ -131,20 +131,24 @@ class PostController extends Controller
         $page_thumbnail = "";
         $page_banner = "";
 
-       
-        if($request->hasFile('page_banner')){
+
+        if ($request->hasFile('page_banner')) {
             $user_img_name = $request->file('page_banner');
-            $user_name = time().'.'.$user_img_name->getClientOriginalExtension();
+            // $user_name = time() . '.' . $user_img_name->getClientOriginalExtension();
+            $name = pathinfo($user_img_name->getClientOriginalName(), PATHINFO_FILENAME);
+            $user_name = Str::slug($name) . '-' . Str::random(5) . '.webp';
             $destinationPath = public_path('uploads/banners');
-            $user_img_name->move($destinationPath, $user_name);
+            // $user_img_name->move($destinationPath, $user_name);
+            Image::make($request->file('page_banner')->getRealPath())
+                ->encode('webp', 80)->save($destinationPath . '/' . $user_name);
             $data['page_banner'] = $user_name;
         }
 
         if ($request->hasfile('page_thumbnail')) {
             $thumbnail_name = $request->file('page_thumbnail')->getClientOriginalName();
-            $extension = $request->file('page_thumbnail')->getClientOriginalExtension();
+            // $extension = $request->file('page_thumbnail')->getClientOriginalExtension();
             $thumbnail_name = explode('.', $thumbnail_name);
-            $page_thumbnail = Str::slug($thumbnail_name[0]) . '-' . Str::random(5) . '.' . $extension;
+            $page_thumbnail = Str::slug($thumbnail_name[0]) . '-' . Str::random(5) . '.webp';
 
             $destinationPath_medium = public_path('uploads/medium');
             $destinationOriginal = public_path('uploads/original');
@@ -152,13 +156,14 @@ class PostController extends Controller
             $product_picture = Image::make($file->getRealPath());
             $width = Image::make($file->getRealPath())->width();
             $height = Image::make($file->getRealPath())->height();
-            
-             /*Upload Original Image*/
-            $product_picture->save($destinationOriginal . '/' . $page_thumbnail);
 
+            /*Upload Original Image*/
+            $product_picture->encode('webp', 90)->save($destinationOriginal . '/' . $page_thumbnail);
+
+            $product_picture = Image::make($file->getRealPath());
             $product_picture->resize($medium_width, $medium_height, function ($constraint) {
                 $constraint->aspectRatio();
-            })->save($destinationPath_medium . '/' . $page_thumbnail);
+            })->encode('webp', 80)->save($destinationPath_medium . '/' . $page_thumbnail);
 
         }
 
@@ -166,7 +171,7 @@ class PostController extends Controller
         $posttypeId = $this->getPostTypeId($request->post_type);
         $data['post_type'] = $posttypeId->id;
         // $data['uri'] = Str::slug($request->uri);
-        $data['uri'] = generate_unique_uri('App\Models\Posts\PostModel',Str::slug($request->uri));
+        $data['uri'] = generate_unique_uri('App\Models\Posts\PostModel', Str::slug($request->uri));
         $data['page_thumbnail'] = $page_thumbnail;
         $isChecked = $request->has('show_in_home');
         $data['show_in_home'] = ($isChecked) ? '1' : '0';
@@ -246,7 +251,7 @@ class PostController extends Controller
     {
         $request->validate([
             'post_title' => 'required',
-            'uri'=>'required|unique:cl_posts,uri,'.$id,
+            'uri' => 'required|unique:cl_posts,uri,' . $id,
         ]);
 
         $banner_width = env('BANNER_WIDTH');
@@ -261,7 +266,7 @@ class PostController extends Controller
         $page_thumbnail = '';
         $page_banner = '';
 
-        if($request->hasFile('page_banner')){
+        if ($request->hasFile('page_banner')) {
             $data = PostModel::find($id);
             if ($data->page_banner) {
                 if (file_exists(env('PUBLIC_PATH') . 'uploads/banners/' . $data->page_banner)) {
@@ -269,9 +274,11 @@ class PostController extends Controller
                 }
             }
             $user_img_name = $request->file('page_banner');
-            $user_name = time().'.'.$user_img_name->getClientOriginalExtension();
+            $name = pathinfo($user_img_name->getClientOriginalName(), PATHINFO_FILENAME);
+            $user_name = Str::slug($name) . '-' . Str::random(5) . '.webp';
             $destinationPath = public_path('uploads/banners');
-            $user_img_name->move($destinationPath, $user_name);
+            Image::make($request->file('page_banner')->getRealPath())
+                ->encode('webp', 90)->save($destinationPath . '/' . $user_name);
 
             $data->page_banner = $user_name;
         }
@@ -286,9 +293,9 @@ class PostController extends Controller
                 }
             }
             $product = $request->file('page_thumbnail')->getClientOriginalName();
-            $extension = $request->file('page_thumbnail')->getClientOriginalExtension();
+            // $extension = $request->file('page_thumbnail')->getClientOriginalExtension();
             $product = explode('.', $product);
-            $product_name = Str::slug($product[0]) . '-' . Str::random(5) . '.' . $extension;
+            $product_name = Str::slug($product[0]) . '-' . Str::random(5) . '.webp';
 
             $destinationPath_medium = public_path('uploads/medium');
             $destinationOriginal = public_path('uploads/original');
@@ -296,14 +303,15 @@ class PostController extends Controller
             $product_picture = Image::make($file->getRealPath());
             $width = Image::make($file->getRealPath())->width();
             $height = Image::make($file->getRealPath())->height();
-            
-             /*Upload Original Image*/
-            $product_picture->save($destinationOriginal . '/' . $product_name);
+
+            /*Upload Original Image*/
+            $product_picture->encode('webp', 90)->save($destinationOriginal . '/' . $product_name);
             $data->page_thumbnail = $product_name;
 
+            $product_picture = Image::make($file->getRealPath());
             $product_picture->resize($medium_width, $medium_height, function ($constraint) {
                 $constraint->aspectRatio();
-            })->save($destinationPath_medium . '/' . $product_name);
+            })->encode('webp', 80)->save($destinationPath_medium . '/' . $product_name);
         }
 
         $posttypeId = $this->getPostTypeId($request->post_type);
@@ -350,7 +358,7 @@ class PostController extends Controller
                 unlink(env('PUBLIC_PATH') . 'uploads/original/' . $data->page_thumbnail);
             }
         }
-         if ($data->page_banner != null) {
+        if ($data->page_banner != null) {
             if (file_exists(env('PUBLIC_PATH') . 'uploads/banners/' . $data->page_banner)) {
                 unlink(env('PUBLIC_PATH') . 'uploads/banners/' . $data->page_banner);
             }
@@ -421,7 +429,7 @@ class PostController extends Controller
 
     public function delete_post_banner(PostModel $postModel, $id)
     {
-        $data = PostModel::find($id);       
+        $data = PostModel::find($id);
         if ($data->page_banner) {
             if (file_exists(env('PUBLIC_PATH') . 'uploads/banners/' . $data->page_banner)) {
                 unlink(env('PUBLIC_PATH') . 'uploads/banners/' . $data->page_banner);

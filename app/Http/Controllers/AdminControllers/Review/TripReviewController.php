@@ -7,49 +7,56 @@ use App\Model\TripReview;
 use App\Models\Travels\TripModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use Image;
 
 class TripReviewController extends Controller
 {
-   public function trip_review(Request  $request)
-   {
-       $review=TripReview::orderby('id','desc')->get();
-       $trip=TripModel::all();
-       return view('admin.trip-reviews.index',compact('review','trip'));
-   }
+    public function trip_review(Request $request)
+    {
+        $review = TripReview::orderby('id', 'desc')->get();
+        $trip = TripModel::all();
+        return view('admin.trip-reviews.index', compact('review', 'trip'));
+    }
 
-   public function post_trip_review(Request $request)
-   {
-    //   dd($request->all());
-       if ($request->isMethod('get'))
-       {
-           $trip=TripModel::all();
-           return view('admin.trip-reviews.create',compact('trip'));  
-       }
-       if ($request->isMethod('post'))  
-       {
-           $request->validate([
-               'full_name'=>'required',
-               'country' => 'required',
-            //   'email' => 'required',
-            //    'contact' => 'required', 
-               'message' => 'required',
-               'photo' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
-           ]);
-           
-           $data = $request->except('photo');
-           $data['trip_id'] = $request->trip_id ?? NULL;
-           if ($request->hasFile('photo')) {
-               $image = $request->file('photo');
-               $name = time() . '.' . $image->getClientOriginalExtension();
-               $destinationPath = public_path('/uploads/reviews/');
-               $image->move($destinationPath, $name);
-               $data['image'] = $name;
-           }
-           TripReview::create($data);
+    public function post_trip_review(Request $request)
+    {
+        //   dd($request->all());
+        if ($request->isMethod('get')) {
+            $trip = TripModel::all();
+            return view('admin.trip-reviews.create', compact('trip'));
+        }
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'full_name' => 'required',
+                'country' => 'required',
+                //   'email' => 'required',
+                //    'contact' => 'required',
+                'message' => 'required',
+                'photo' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+            ]);
 
-           return redirect()->back()->with('success','Review posted successfully');
-       }
-   }
+            $data = $request->except('photo');
+            $data['trip_id'] = $request->trip_id ?? NULL;
+            if ($request->hasFile('photo')) {
+                $image = $request->file('photo');
+
+                $filename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                $name = Str::slug($filename) . '-' . Str::random(5) . '.webp';
+
+                $destinationPath = public_path('/uploads/reviews/');
+
+                Image::make($image->getRealPath())
+                    ->encode('webp', 90)
+                    ->save($destinationPath . $name);
+
+                $data['image'] = $name;
+            }
+            TripReview::create($data);
+
+            return redirect()->back()->with('success', 'Review posted successfully');
+        }
+    }
 
     public function delete_file($id)
     {
@@ -64,57 +71,60 @@ class TripReviewController extends Controller
 
     public function edit_trip_review(Request $request, $id)
     {
-         if ($request->isMethod('get'))
-       {
+        if ($request->isMethod('get')) {
 
-           $trip = TripModel::all();
-            $data = TripReview::findorfail($id);           
-           return view('admin.trip-reviews.edit',compact('trip','data'));
-       }
+            $trip = TripModel::all();
+            $data = TripReview::findorfail($id);
+            return view('admin.trip-reviews.edit', compact('trip', 'data'));
+        }
 
-        if ($request->isMethod('post'))
-        {
-            $id=$request->id;
+        if ($request->isMethod('post')) {
+            $id = $request->id;
             // $request->validate([
-            //     'full_name'=>'required',                
+            //     'full_name'=>'required',
             //     'brief'=>'required',
             // ]);
-            $data['trip_id'] = $request->trip_id;            
+            $data['trip_id'] = $request->trip_id;
             $data['full_name'] = $request->full_name;
             $data['country'] = $request->country;
-            $data['email']=$request->email;
-            $data['contact']=$request->contact;
-            $data['message']=$request->message;
-    
+            $data['email'] = $request->email;
+            $data['contact'] = $request->contact;
+            $data['message'] = $request->message;
 
-            if ($request->hasFile('photo')) {                      
-            if ($request->image) {
-                if (file_exists(env('PUBLIC_PATH') . 'uploads/reviews/' . $request->image)) {
-                    unlink(env('PUBLIC_PATH') . 'uploads/reviews/' . $request->image);
+
+            if ($request->hasFile('photo')) {
+                if ($request->image) {
+                    if (file_exists(env('PUBLIC_PATH') . 'uploads/reviews/' . $request->image)) {
+                        unlink(env('PUBLIC_PATH') . 'uploads/reviews/' . $request->image);
+                    }
                 }
-              }
+
                 $this->delete_file($id);
                 $image = $request->file('photo');
-                $name = time() . '.' . $image->getClientOriginalExtension();
+                $filename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                $name = Str::slug($filename) . '-' . Str::random(5) . '.webp';
+
                 $destinationPath = public_path('/uploads/reviews/');
-                $image->move($destinationPath, $name);
+
+                Image::make($image->getRealPath())
+                    ->encode('webp', 90)
+                    ->save($destinationPath . $name);
+
                 $data['image'] = $name;
             }
-            $edit=TripReview::findorfail($id);
-            if ($edit->update($data))
-            {
-                return redirect()->back()->with('success','Trip review updated successfully');
+            $edit = TripReview::findorfail($id);
+            if ($edit->update($data)) {
+                return redirect()->back()->with('success', 'Trip review updated successfully');
             }
         }
     }
 
     public function delete_trip_review(Request $request)
     {
-        $id=$request->id;
-        $del=TripReview::findorfail($id);
-        if($this->delete_file($id)&&$del->delete())
-        {
-            return redirect()->back()->with('success','Review deleted  successfully');
+        $id = $request->id;
+        $del = TripReview::findorfail($id);
+        if ($this->delete_file($id) && $del->delete()) {
+            return redirect()->back()->with('success', 'Review deleted  successfully');
         }
     }
 

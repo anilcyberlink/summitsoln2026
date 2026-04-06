@@ -39,7 +39,7 @@ class PostImageController extends Controller
      */
     public function store(Request $request)
     {
-       $request->validate([
+        $request->validate([
             'file_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:3072|dimensions:max_width=2500,max_height=2000',
         ]);
 
@@ -47,24 +47,24 @@ class PostImageController extends Controller
         $medium_height = env('MEDIUM_HEIGHT');
 
         $req = $request->all();
-        $file =  $request->file('file_image');
+        $file = $request->file('file_image');
 
-        if($request->hasfile('file_image')){
+        if ($request->hasfile('file_image')) {
             $_file = $request->file('file_image')->getClientOriginalName();
-            $extension = $request->file('file_image')->getClientOriginalExtension();
-            $_file = explode('.', $_file);            
-            $file_name = Str::slug($_file[0]) . '-' . Str::random(40) . '.' . $extension;
+            // $extension = $request->file('file_image')->getClientOriginalExtension();
+            $_file = explode('.', $_file);
+            $file_name = Str::slug($_file[0]) . '-' . Str::random(5) . '.webp';
             $destinationPath_medium = public_path('uploads/medium');
             $thumbanil_picture = Image::make($file->getRealPath());
-            $thumbanil_picture->save($destinationPath_medium .'/'. $file_name );           
+            $thumbanil_picture->encode('webp', 80)->save($destinationPath_medium . '/' . $file_name);
         }
-        
+
         $req['post_id'] = $request->post_id;
         $req['file_name'] = $file_name;
         $req['title'] = $request->title;
         $data = PostImageModel::create($req);
 
-        return redirect()->back()->with('message','Image Upload Successful');
+        return redirect()->back()->with('message', 'Image Upload Successful');
     }
 
     /**
@@ -86,8 +86,8 @@ class PostImageController extends Controller
      */
     public function edit($post_id, $id)
     {
-        $data = PostImageModel::where('id',$id)->first();
-        return view('admin.multiple-photo.edit', compact('id','data'));
+        $data = PostImageModel::where('id', $id)->first();
+        return view('admin.multiple-photo.edit', compact('id', 'data'));
     }
 
     /**
@@ -101,34 +101,36 @@ class PostImageController extends Controller
     {
         $req = PostImageModel::find($id);
         $post_id = $req->post_id;
-         $data = PostImageModel::where('post_id',$post_id)->get();
+        $data = PostImageModel::where('post_id', $post_id)->get();
         $document = "";
-        
-          if($request->hasfile('file_name')){
+
+        if ($request->hasfile('file_name')) {
 
             $req = PostImageModel::find($id);
-         
-             if(file_exists(public_path('uploads/medium/' .  $req->file_name))){
+
+            if (file_exists(public_path('uploads/medium/' . $req->file_name))) {
                 unlink('uploads/medium/' . $req->file_name);
             }
-          
 
             $doc = $request->file('file_name')->getClientOriginalName();
-            $extension = $request->file('file_name')->getClientOriginalExtension();
+            // $extension = $request->file('file_name')->getClientOriginalExtension();
             $doc = explode('.', $doc);
-            $document = Str::slug($doc[0]) . '-' . uniqid() . '.' . $extension;
-            $request->file('file_name')->move( public_path('uploads/medium/'), $document);
+            $document = Str::slug($doc[0]) . '-' . Str::random(5) . '.webp';
+            // $document = Str::slug($doc[0]) . '-' . uniqid() . '.webp';
+            // $request->file('file_name')->move(public_path('uploads/medium/'), $document);
+            Image::make($request->file('file_name')->getRealPath())
+                ->encode('webp', 80)->save(public_path('uploads/medium/') . $document);
 
-        $req->file_name = $document;
-    } 
+            $req->file_name = $document;
+        }
 
-    $req->title = $request->title;
+        $req->title = $request->title;
 
-    if($req->save()){
-         return redirect()->route('admin.multiplephoto',compact('post_id','data'))->with('message','Update Sucessful.');
-    }else{
-        return "Error";
-    }
+        if ($req->save()) {
+            return redirect()->route('admin.multiplephoto', compact('post_id', 'data'))->with('message', 'Update Sucessful.');
+        } else {
+            return "Error";
+        }
     }
 
     /**
@@ -140,25 +142,26 @@ class PostImageController extends Controller
     public function destroy($id)
     {
         $data = PostImageModel::find($id);
-        if($data->file_name){
-            
-        if(file_exists(public_path('uploads/medium/' .  $data->file_name))){
-            unlink('uploads/medium/' . $data->file_name);
+        if ($data->file_name) {
+
+            if (file_exists(public_path('uploads/medium/' . $data->file_name))) {
+                unlink('uploads/medium/' . $data->file_name);
+            }
+
         }
-        
-    }
-    $data->delete();
-    return response()->json([
-                'message' => 'Delete Successful!',
-                'class_name' => 'alert-success'
-            ]);
+        $data->delete();
+        return response()->json([
+            'message' => 'Delete Successful!',
+            'class_name' => 'alert-success'
+        ]);
     }
 
-    public function upload_form($id){
+    public function upload_form($id)
+    {
         // return $id;
         $post_id = $id;
-          $data = PostImageModel::where('post_id',$id)->get();
-        return view('admin.multiple-photo.create', compact('post_id','data'));
+        $data = PostImageModel::where('post_id', $id)->get();
+        return view('admin.multiple-photo.create', compact('post_id', 'data'));
     }
 
 }
